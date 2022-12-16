@@ -4,6 +4,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.util.Log;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.widget.ArrayAdapter;
@@ -28,6 +29,7 @@ public class MainActivity extends AppCompatActivity {
     ArrayAdapter adapter;
     ArrayList<String> items;
     WebView webView;
+    ArrayList<Product> products;
 
 
     @Override
@@ -49,6 +51,8 @@ public class MainActivity extends AppCompatActivity {
         adapter = new ArrayAdapter(this, android.R.layout.simple_list_item_1, items);
         listView.setAdapter(adapter);
 
+        products = new ArrayList<>();
+
 
         ParsingThread parsingThread = new ParsingThread();
         parsingThread.execute();
@@ -68,6 +72,18 @@ public class MainActivity extends AppCompatActivity {
                 Elements elements = document.getElementsByClass("grid-product__meta");
                 for (Element element : elements){
                     items.add(element.child(0).text() + " " + element.child(1).text());
+                    Double price;
+                    try {
+                        price = Double.valueOf(element.child(1).text().substring(1));
+                    }catch (Exception e){
+                        Log.d("Minecraft", "ошибка преобразования цены " + e.getMessage());
+                        Log.d("Minecraft", "исходная строка " + element.child(1).text().substring(1));
+                        price = -100.0;
+                    }
+
+                    Product product = new Product(element.child(0).text(), price);
+                    products.add(product);
+                    Log.d("Minecraft", product.toString());
                 }
 
 
